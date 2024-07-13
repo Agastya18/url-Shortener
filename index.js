@@ -6,12 +6,17 @@ const dotenv = require("dotenv");
 const app = express();
 const rateLimit = require('express-rate-limit');
 dotenv.config();
+const mockData = require('./MOCK_DATA');
 const PORT = process.env.PORT;
 connectToMongoDB(process.env.MONGO_URI).then(() =>
   console.log("Mongodb connected")
 );
 
 app.use(express.json());
+app.get('/json', async (req, res) => {
+  res.json(mockData);
+
+})
 
 // Define rate limits
 const createShortUrlLimiter = rateLimit({
@@ -64,12 +69,14 @@ app.get("/:shortId", async (req, res) => {
     }
   );
 
-    // Check if the URL has expired
-    if (new Date() > entry.expirationDate) {
-      return res.status(410).send('URL has expired');
-    }
+    // // Check if the URL has expired
+    // if (new Date() > entry.expirationDate) {
+    //   return res.status(410).send('URL has expired');
+    // }
 
   res.redirect(entry.redirectURL);
 });
+
+
 
 app.listen(PORT, () => console.log(`Server Started at PORT:${PORT}`));
